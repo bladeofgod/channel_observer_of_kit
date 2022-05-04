@@ -5,7 +5,8 @@ import 'test_channel.dart';
 
 void main() {
   //runApp(const MyApp());
-  ChannelObserverOfKit.runApp(const MyApp());
+  //ChannelObserverOfKit.runApp(const MyApp());
+  ChannelObserverOfKit.customZone(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -17,21 +18,23 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+
   @override
   void initState() {
     super.initState();
     doTest();
-  }
-
-  void doTest() async {
-    try{
-      await TestChannel.testInt;
-      await TestChannel.testNull;
-    }catch (e) {
+    ChannelObserverOfKit.errorStream.listen((event) {
+      debugPrint('类型错误，捡出调用队列');
       ChannelObserverOfKit.getBindingInstance()?.popChannelRecorders().forEach((element) {
         debugPrint(element.getPackage().toString());
       });
-    }
+    });
+  }
+
+  void doTest() async {
+    await Future.delayed(const Duration(seconds: 2));
+    await TestChannel.testInt;
+    //await TestChannel.testNull;w
 
   }
 
@@ -43,9 +46,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: const Center(
-          child: Text('Running on: \n'),
-        ),
+        body: const Text('Plugin example app'),
       ),
     );
   }
