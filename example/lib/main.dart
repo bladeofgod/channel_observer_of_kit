@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('channel observer of kit'),
         ),
         body: Builder(
           builder: (BuildContext context) {
@@ -47,10 +47,14 @@ class _MyAppState extends State<MyApp> {
               WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
                 OverlayEntry entry = OverlayEntry(builder: (_) => const ChannelObserverWidget());
                 Overlay.of(context)?.insert(entry);
-                doTest();
+
               });
             }
-            return const Text('Plugin example app');
+            return Center(
+              child: ElevatedButton(onPressed: () {
+                doTest();
+              }, child: const Text('测试')),
+            );
           },),
       ),
     );
