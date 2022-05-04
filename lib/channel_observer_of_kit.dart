@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:channel_observer_of_kit/widget/channel_observer_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -16,19 +17,34 @@ export 'widget/recent_channel_record_page.dart';
 
 typedef ZoneErrorHandler = void Function(Object error, StackTrace? stack);
 
+///zone的error处理方法
+/// * 可以覆盖此方法，然后自处理相关错误
+/// * PS. 如果覆盖[zoneErrorHandler],将导致[ChannelObserverOfKit._errorStreamController]
+/// * 、[ChannelObserverWidget]的失效。
 ZoneErrorHandler zoneErrorHandler = ChannelObserverOfKit._defaultErrorHandler;
 
 ///platform channel 工具箱 用于记录最近的调用记录
-/// * 支持线上
+/// * 支持release/debug
+///
+/// * [customZone] 和 [runApp] 两个方法并非必须使用，如果项目中
+/// * 有类似的自定义，也可以直接混入[ChannelObserverServicesBinding]。
+/// * 或者仿照代码，做自定义更改。
+///
 class ChannelObserverOfKit {
 
+  ///用于控制zone内error的上报
+  /// * 基于[customZone] 和 [runApp]的实现。
   static final StreamController<ErrorPackage> _errorStreamController = StreamController.broadcast();
 
+  ///zone error sink
   static StreamSink<ErrorPackage> get errorSink => _errorStreamController.sink;
 
+  ///zone error stream
+  /// * 可以监听[errorStream]获取错误信息。
   static Stream<ErrorPackage> get errorStream => _errorStreamController.stream;
 
   ///自定义zone
+  /// * 用于捕获zone内的异常
   static void customZone(
       Widget rootWidget, {
         bool debugUpload = true, //debug下依然上报（上报到测试环境）
@@ -43,12 +59,13 @@ class ChannelObserverOfKit {
     runZonedGuarded<Future<void>>(() async {
       runApp(rootWidget);
     }, zoneErrorHandler, zoneSpecification: zoneSpecification);
-    // This captures errors reported by the Flutter framework.
     FlutterError.onError = (details) {
       Zone.current.handleUncaughtError(details.exception, details.stack ?? StackTrace.fromString('empty'));
     };
   }
 
+  ///自定义[WidgetsFlutterBinding]
+  /// * 用于混入[ChannelObserverServicesBinding]。
   static runApp(Widget app) {
     ChannelObserverBinding.ensureInitialized()
       // ignore: invalid_use_of_protected_member

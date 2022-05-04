@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../model/package_model.dart';
 
+///channel 调用记录的展示页面
 class RecentChannelRecordPage extends StatefulWidget{
 
   const RecentChannelRecordPage({Key? key, required this.records}) : super(key: key);

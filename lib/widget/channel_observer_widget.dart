@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 
 import '../channel_observer_of_kit.dart';
 
+///悬浮按钮
+/// * 内部监听[ChannelObserverOfKit.errorStream]，并做状态且换。
+/// * 在有错误告警的情况下，点击会进去[RecentChannelRecordPage]页面
+/// * 展示最近的channel 通信记录。
+///
+/// * 此功能需基于[ChannelObserverOfKit.customZone(rootWidget)]的接入。
+/// * 如果需要自定义，可以参照此类的使用方式进行重定义
 class ChannelObserverWidget extends StatefulWidget{
   const ChannelObserverWidget({Key? key}) : super(key: key);
 
