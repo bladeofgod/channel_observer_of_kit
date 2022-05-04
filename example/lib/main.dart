@@ -18,17 +18,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  bool hasInsert = false;
 
   @override
   void initState() {
     super.initState();
-    doTest();
-    ChannelObserverOfKit.errorStream.listen((event) {
-      debugPrint('类型错误，捡出调用队列');
-      ChannelObserverOfKit.getBindingInstance()?.popChannelRecorders().forEach((element) {
-        debugPrint(element.getPackage().toString());
-      });
-    });
   }
 
   void doTest() async {
@@ -46,7 +40,18 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: const Text('Plugin example app'),
+        body: Builder(
+          builder: (BuildContext context) {
+            if(!hasInsert) {
+              hasInsert = true;
+              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+                OverlayEntry entry = OverlayEntry(builder: (_) => const ChannelObserverWidget());
+                Overlay.of(context)?.insert(entry);
+                doTest();
+              });
+            }
+            return const Text('Plugin example app');
+          },),
       ),
     );
   }

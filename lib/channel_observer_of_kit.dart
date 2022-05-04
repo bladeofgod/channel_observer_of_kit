@@ -10,6 +10,10 @@ import 'package:flutter/services.dart';
 import 'model/package_model.dart';
 import 'model/warehouse.dart';
 
+export 'widget/channel_observer_widget.dart';
+export 'widget/recent_channel_record_page.dart';
+
+
 typedef ZoneErrorHandler = void Function(Object error, StackTrace? stack);
 
 ZoneErrorHandler zoneErrorHandler = ChannelObserverOfKit._defaultErrorHandler;
