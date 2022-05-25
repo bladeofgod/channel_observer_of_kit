@@ -111,7 +111,7 @@ IStorage<ChannelModel> channelRecorder = CommonStorage(maxCount: recorderSize);
 
 mixin ChannelObserverServicesBinding on BindingBase, ServicesBinding{
 
-  late RikiBinaryMessengerProxy _proxy;
+  late BinaryMessengerProxy _proxy;
 
   ///弹出队列所有记录
   /// 顺序： [远...近]
@@ -119,15 +119,15 @@ mixin ChannelObserverServicesBinding on BindingBase, ServicesBinding{
 
   @override
   BinaryMessenger createBinaryMessenger() {
-    _proxy = RikiBinaryMessengerProxy(super.createBinaryMessenger());
+    _proxy = BinaryMessengerProxy(super.createBinaryMessenger());
     return _proxy;
   }
 }
 
 
-class RikiBinaryMessengerProxy extends BinaryMessenger{
+class BinaryMessengerProxy extends BinaryMessenger{
 
-  RikiBinaryMessengerProxy(this.origin);
+  BinaryMessengerProxy(this.origin);
 
   final BinaryMessenger origin;
 
