@@ -4,6 +4,7 @@ import 'package:channel_observer_of_kit/model/package_model.dart';
 import 'package:flutter/material.dart';
 
 import '../channel_observer_of_kit.dart';
+import 'package:flutter_ume/flutter_ume.dart';
 
 ///悬浮按钮
 /// * 内部监听[ChannelObserverOfKit.errorStream]，并做状态且换。
@@ -12,12 +13,49 @@ import '../channel_observer_of_kit.dart';
 ///
 /// * 此功能需基于[ChannelObserverOfKit.customZone(rootWidget)]的接入。
 /// * 如果需要自定义，可以参照此类的使用方式进行重定义
-class ChannelObserverWidget extends StatefulWidget{
-  const ChannelObserverWidget({Key? key}) : super(key: key);
+class ChannelObserverWidget extends StatefulWidget implements Pluggable{
+
+  ChannelObserverWidget({Key? key}) : super(key: key);
+
+  OverlayEntry? entry;
+
+  bool isOpen = false;
+
+  BuildContext? ctx;
 
   @override
   State<StatefulWidget> createState() {
     return ChannelObserverWidgetState();
+  }
+
+
+  @override
+  Widget buildWidget(BuildContext? context) {
+    ctx = context;
+    return SizedBox();
+  }
+
+  @override
+  String get displayName => 'channel_observer';
+
+  @override
+  ImageProvider<Object> get iconImageProvider => AssetImage('assets/channel.png', package: 'channel_observer_of_kit');
+
+  @override
+  String get name => 'channel_observer';
+
+  @override
+  void onTrigger() {
+    if(entry == null) {
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        entry = OverlayEntry(builder: (_) => ChannelObserverWidget());
+        Overlay.of(ctx!)?.insert(entry!);
+      });
+    } else {
+      entry?.remove();
+      entry = null;
+    }
+
   }
 
 }
@@ -25,6 +63,8 @@ class ChannelObserverWidget extends StatefulWidget{
 class ChannelObserverWidgetState extends State<ChannelObserverWidget> {
 
   final List<ChannelModel> _cacheBucket = [];
+
+  OverlayEntry? entry;
 
   bool _showWarning = false;
 
@@ -67,7 +107,13 @@ class ChannelObserverWidgetState extends State<ChannelObserverWidget> {
                 _showWarning = false;
                 _cacheBucket.clear();
               });
-              await Navigator.push(context, MaterialPageRoute(builder: (_) => RecentChannelRecordPage(records: tem,)));
+              if(entry == null) {
+                entry = OverlayEntry(builder: (_) => RecentChannelRecordPage(records: tem, popCallback: () {
+                  entry?.remove();
+                  entry = null;
+                },));
+                Overlay.of(context)?.insert(entry!);
+              }
             }
           },
           onPanUpdate: _dragUpdate,

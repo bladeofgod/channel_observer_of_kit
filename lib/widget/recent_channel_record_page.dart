@@ -7,9 +7,11 @@ import '../model/package_model.dart';
 ///channel 调用记录的展示页面
 class RecentChannelRecordPage extends StatefulWidget{
 
-  const RecentChannelRecordPage({Key? key, required this.records}) : super(key: key);
+  const RecentChannelRecordPage({Key? key, required this.records, required this.popCallback}) : super(key: key);
 
   final List<ChannelModel> records;
+
+  final Function popCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -28,7 +30,7 @@ class RecentChannelRecordPageState extends State<RecentChannelRecordPage> {
           title: const Text('recently channel record'),
           leading: GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              widget.popCallback.call();
             },
             child: const Icon(Icons.chevron_left, color: Colors.white,),
           ),
